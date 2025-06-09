@@ -1,14 +1,11 @@
 import { useState } from 'react';
 import ToDoItem from '../components/ToDoItem';
-import Navbar from '../components/Navbar';
 import { useTasks } from '../context/TaskContext';
 
 const ToDoApp = () => {
   const { tasks, addTask, updateTask, deleteTask, toggleTask } = useTasks();
   const [input, setInput] = useState('');
-  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
   const [editId, setEditId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
 
   const handleAdd = () => {
     if (!input.trim()) return;
@@ -38,14 +35,8 @@ const ToDoApp = () => {
     }
   };
 
-  const filteredTasks = tasks.filter(t =>
-    (filter === 'all' ? true : filter === 'active' ? !t.completed : t.completed) &&
-    t.text.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
     <div className="flex justify-center">
-      <Navbar onSearch={setSearchQuery} />
       <div className="bg-white p-6 shadow-md rounded-md w-96 text-center">
         <h2 className="text-2xl font-bold mb-4">To-Do List</h2>
         <div className="flex mb-4 gap-2">
@@ -60,36 +51,21 @@ const ToDoApp = () => {
             {editId ? 'Update' : 'Add'}
           </button>
         </div>
-        <div className="flex justify-center gap-2 mb-4">
-          <button
-            className={`px-3 py-1 rounded ${filter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-            onClick={() => setFilter('all')}
-          >
-            All
-          </button>
-          <button
-            className={`px-3 py-1 rounded ${filter === 'active' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-            onClick={() => setFilter('active')}
-          >
-            Active
-          </button>
-          <button
-            className={`px-3 py-1 rounded ${filter === 'completed' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-            onClick={() => setFilter('completed')}
-          >
-            Completed
-          </button>
-        </div>
+
         <div className="space-y-2">
-          {filteredTasks.map(task => (
-            <ToDoItem
-              key={task.id}
-              task={task}
-              onToggle={toggleTask}
-              onDelete={deleteTask}
-              onEdit={(id) => handleEdit(id)}
-            />
-          ))}
+          {tasks.length > 0 ? (
+            tasks.map(task => (
+              <ToDoItem
+                key={task.id}
+                task={task}
+                onToggle={toggleTask}
+                onDelete={deleteTask}
+                onEdit={handleEdit}
+              />
+            ))
+          ) : (
+            <p className="text-gray-500">No tasks yet.</p>
+          )}
         </div>
       </div>
     </div>
